@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 PATH_SEPARATOR = getattr(settings, 'COMMENT_PATH_SEPARATOR', '/')
 PATH_DIGITS = getattr(settings, 'COMMENT_PATH_DIGITS', 10)
 
+
 class ThreadedComment(Comment):
     title = models.TextField(_('Title'), blank=True)
     parent = models.ForeignKey('self', null=True, blank=True, default=None, related_name='children', verbose_name=_('Parent'))
@@ -29,6 +30,10 @@ class ThreadedComment(Comment):
 
     def save(self, *args, **kwargs):
         skip_tree_path = kwargs.pop('skip_tree_path', False)
+
+        if not self.ip_address and not self.ip_address is None:
+            self.ip_address = None
+
         super(ThreadedComment, self).save(*args, **kwargs)
         if skip_tree_path:
             return None
